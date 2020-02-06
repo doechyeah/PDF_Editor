@@ -1,4 +1,6 @@
 import argparse
+import os
+import sys
 from PyPDF2 import PdfFileMerger, PdfFileWriter, PdfFileReader
 
 # Parse arguments of -o: Use m for merge, s for slice
@@ -10,13 +12,24 @@ args = parser.parse_args()
 # PDF merge function.
 # Asks how many PDF's to merge and asks for file names.
 def mergepdf():
-    merger = PdfFilerMerger()
-    num = input("How many PDF's do you want to merge together: ")
-    pdflist = [input("Enter PDF name: ") for x in num]
-    for filen in pdflist:
-        merger.append(PdfFileReader(file(filen, 'rb')))
-    merger.write("merged-docs.pdf")
-    print("Done.")
+	merger = PdfFileWriter()
+	num = int(input("How many PDF's do you want to merge together: "))
+	pdflist = []
+	for x in range(num):
+		pdflist.append(input("Enter PDF name: "))
+	for path in pdflist:
+		pdf_reader = PdfFileReader(path)
+		print(path)
+		if pdf_reader.isEncrypted:
+			pdf_reader.decrypt('')
+		for page in range(pdf_reader.getNumPages()):
+			# Add each page to the writer object
+			merger.addPage(pdf_reader.getPage(page))
+#    for filen in pdflist:
+#       merger.append(PdfFileReader(filen))
+	with open('merged-docs.pdf', 'wb') as out:
+		merger.write(out)
+	print("Done.")
 
 # PDF slice function
 # Asks filename of PDF and slices depending on page numbers.
